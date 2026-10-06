@@ -264,9 +264,8 @@ from another property's undeclared fragments MUST NOT leak into its environment.
 UAL 0.6-draft requires the new blueprint dialect, stable ids, and digest-bound
 contexts using `https://cips.cardano.org/cips/cipXXXX/profiles/uplc-step-check/v1`.
 The initial implementation supports Data/native parameters, raw Data runtime inputs,
-universal parameter mode, and explicit CEK step/semantics settings with evaluation
-acceptance. Scott, applied parameter mode and ledger-unit checking
-are explicit errors. Universal mode requires the proposition to quantify over all
+universal and fully applied parameter modes, and explicit CEK step/semantics settings
+with evaluation acceptance. Scott and ledger-unit checking are explicit errors. Universal mode requires the proposition to quantify over all
 parameters and include any required domain premises; metadata is not a theorem.
 
 Every runnable property is checked afresh, including properties whose old evidence
@@ -399,3 +398,19 @@ carries a visited set across self and mutually recursive types. The existing
 `deriveDefinitions` API retains its behavior for custom `Unroll` instances;
 opaque custom types can supply an explicit finite closure with `definitionsFor`. The checker retains arbitrary finite Data depth,
 but the CEK budget still bounds execution.
+
+## Applied deployments
+
+`ONCHAIN` describes the template's complete argument list. A property's checking
+context may bind every parameter with `mode: applied`; the formal statement then
+calls the generated wrapper with only its remaining runtime arguments. The
+Plutus API `writeInterfaceBundleWithBindings` selects bindings by property and
+validator id. `compiledParameter` supplies Flat value artifacts and
+`appliedParameters` constructs the unoptimized template application.
+
+The context binds each term, the specialized program artifact and its script
+hash. The checker validates wire representations, parameter order, complete
+coverage, artifact digests and exact program structure before checking the
+proposition. Unsupported schema refinements fail explicitly. This is direct
+verification of the specialized program; it does not automatically instantiate a
+previous universal theorem or trust historical evidence.
