@@ -1,4 +1,4 @@
-# Temporal operators for Blaster state machines
+# UAL 1.0 — Temporal operators for Blaster state machines
 
 ## 1. Execution
 
