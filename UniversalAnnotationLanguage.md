@@ -1,4 +1,4 @@
-# Universal Annotation Language (UAL) — Specification 0.5
+# Universal Annotation Language (UAL) — Specification 1.0
 
 UAL describes executable properties of compiled Cardano programs using Lean 4
 terms embedded in surface-language comments. A producer emits a CIP-0057
@@ -66,7 +66,7 @@ return-value, cost-model, and protocol conditions.
 `[exCPU: n, exMem: m]` remains a distinct ledger-budget declaration. A consumer
 without support for it MUST reject that verification request, rather than convert
 it to steps or invent a default. Steps and ledger units MUST NOT be mixed.
-The initial Blaster 0.5 checking profile supports explicit step budgets only.
+The initial Blaster 1.0 checking profile supports explicit step budgets only.
 Legacy annotations without execution settings remain parseable, but are not
 executable under this profile. Duplicate and unknown options are errors.
 
@@ -104,7 +104,7 @@ fragment depends on M2's fragment, not the reverse. Dependencies through modules
 without predicates MUST be preserved. Fragment ids are unique and the dependency
 graph MUST be acyclic. Fragment array order has no meaning.
 
-The 0.5 blueprint profile elaborates a property's fragment closure in the
+The 1.0 blueprint profile elaborates a property's fragment closure in the
 blueprint's generated namespace. Helper names in that closure must be unambiguous;
 a producer or consumer MUST diagnose collisions. Qualified/module-isolated
 helpers may be introduced by a future profile; silently merging collisions is
@@ -158,7 +158,7 @@ The producer MUST:
 2. Generate the blueprint with compiled code, recomputed script hashes, stable ids,
    schema definitions, ordered encodings, and explicit execution settings.
 3. Write the final blueprint bytes before hashing them into `assurance.blueprint.hash`.
-4. Emit a detached assurance document with language name, version `0.5`, and URI
+4. Emit a detached assurance document with language name, version `1.0`, and URI
    `https://github.com/input-output-hk/UniversalAnnotationLanguage`.
 5. Emit claims with no evidence until verification actually runs; never fabricate
    a `verified` record at compilation time.
@@ -174,7 +174,7 @@ available content digests, recomputes blueprint script hashes, imports the UPLC,
 and elaborates propositions against generated types, stable wrappers, and the
 explicit fragment closure. Each property is checked independently; definitions
 from another property's undeclared fragments MUST NOT leak into its environment.
-UAL 0.5 requires stable ids, `asData` arguments, and explicit step/semantics settings
+UAL 1.0 requires stable ids, `asData` arguments, and explicit step/semantics settings
 in the initial implementation. Unsupported settings are errors, not fallback
 verification.
 
