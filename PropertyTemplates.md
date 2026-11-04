@@ -75,7 +75,7 @@ the wrapper around the imported compiled bytes. It uses `isUnsuccessful`, meanin
 an actual CEK error. A step-limit exhaustion is unfinished execution and does
 not satisfy the claim. The property establishes no positive acceptance claim:
 a script that always fails satisfies purpose isolation. The separate
-`accepts-some-context` template below checks positive acceptance without
+`accepts-some-context` template below seeks an acceptance witness without
 changing the meaning of isolation.
 
 The producer emits the equivalent disjunction `allowedPurpose(ctx) ∨
@@ -99,27 +99,33 @@ the ordinary assurance digest bindings and fresh verification requirements.
 ```
 
 This template takes no arguments and generates the id
-`<scope>_accepts_some_context`. It supports the same initial target shape as
-purpose isolation: one Plutus V3 `ONCHAIN` script whose final argument is raw
-`BuiltinData`, with any earlier parameters represented by their declared
-compiled-interface types and encodings. All script parameters and one typed V3
-`ScriptContext` are *existentially* quantified. The generated claim is:
+`<scope>_accepts_some_context`. It supports a Plutus V1, V2 or V3 `ONCHAIN`
+script whose final argument is raw `BuiltinData`, with any earlier arguments
+represented by their declared compiled-interface types and encodings. The final
+argument is encoded from that version's typed `ScriptContext`. All earlier
+arguments and the context are universally quantified. The generated claim is
+deliberately the *negation* of the desired existence statement:
 
 ```text
-There exist script parameters and a typed V3 ScriptContext ctx such that
-executing the exact compiled script on those parameters and encode(ctx)
-terminates successfully.
+For every preceding argument and every typed ScriptContext ctx,
+executing the exact compiled script on those arguments and encode(ctx)
+does not terminate successfully.
 ```
 
-The source is equivalent to `∃ parameters ctx, isSuccessful(run(parameters,
-encode(ctx)))`. It does not mention purpose isolation, constrain the purpose,
-or read blueprint purpose metadata. A user may declare either template alone
-or both, and each receives its own checking result. The existence claim
-excludes an always-rejecting script but does not establish that every context
-is accepted, that a context obeys all ledger validity rules, or that the
-verification budget suffices for other paths. A step-limit exhaustion is not
-successful termination.
+Plutus V4 requires a V4 `ScriptContext` codec in the target ledger library and
+is diagnosed as unsupported until that codec is available.
 
-The two verdicts are independent: an always-rejecting script can satisfy
-isolation while falsifying acceptance, and a script that accepts a wrong purpose
-can falsify isolation while satisfying acceptance.
+The producer marks this generated claim `expect:falsified` in assurance metadata;
+the author does not write an expectation option. A *confirmed* falsification
+supplies the desired witness for `∃ inputs ctx, isSuccessful(run(inputs,
+encode(ctx)))`. An abstract SMT model that fails replay is not an accepted
+witness. The claim does not mention purpose isolation, constrain the purpose,
+or read blueprint purpose metadata. A user may declare either template alone
+or both. A confirmed witness excludes an always-rejecting script but does not
+establish that every context is accepted, that a context obeys all ledger
+validity rules, or that the verification budget suffices for other paths.
+A step-limit exhaustion is not successful termination.
+
+The two checks are independent: an always-rejecting script can satisfy the
+negative acceptance claim while satisfying isolation, and a script that accepts
+a wrong purpose can falsify isolation while providing an acceptance witness.
