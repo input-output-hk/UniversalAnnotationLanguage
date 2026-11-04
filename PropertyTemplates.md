@@ -15,8 +15,17 @@ inference of intent is delegated to the checker.
 The scope names exactly one `ONCHAIN` script. The template supplies the assertion;
 no property id, natural-language statement or Lean body is repeated in the source.
 Trailing text, duplicate options, unknown templates and unknown arguments are
-errors. The generated id is `<scope>_purpose_isolation`, subject to the existing
-property-id rules and duplicate-id checks.
+errors. Each template annotation produces one independent property. A script
+may declare both:
+
+```haskell
+{-@ PROPERTY [scope: auction] [template: purpose-isolation spending] @-}
+{-@ PROPERTY [scope: auction] [template: accepts-some-context] @-}
+```
+
+The generated ids are `<scope>_purpose_isolation` and
+`<scope>_accepts_some_context`, subject to the existing property-id rules and
+duplicate-id checks.
 
 ## Purpose isolation
 
@@ -65,9 +74,9 @@ The generated Lean source uses the ledger library's V3 `ScriptContext` codec and
 the wrapper around the imported compiled bytes. It uses `isUnsuccessful`, meaning
 an actual CEK error. A step-limit exhaustion is unfinished execution and does
 not satisfy the claim. The property establishes no positive acceptance claim:
-a script that always fails satisfies purpose isolation. Demonstrations should
-also check successful allowed-purpose execution and replay a counterexample
-against a deliberately vulnerable script.
+a script that always fails satisfies purpose isolation. The separate
+`accepts-some-context` template below checks positive acceptance without
+changing the meaning of isolation.
 
 The producer emits the equivalent disjunction `allowedPurpose(ctx) ∨
 isUnsuccessful(run(ctx))`. This keeps the compiled call in ordinary proposition
@@ -82,3 +91,31 @@ checker can decide it. Reports must preserve those distinctions.
 Templates introduce no axioms, proofs or handwritten replacement validator. Their
 generated formal source, checking context and compiled program remain subject to
 the ordinary assurance digest bindings and fresh verification requirements.
+
+## Accepts some context
+
+```haskell
+{-@ PROPERTY [scope: validator] [template: accepts-some-context] @-}
+```
+
+This template takes no arguments and generates the id
+`<scope>_accepts_some_context`. It supports the same initial target shape as
+purpose isolation: one Plutus V3 `ONCHAIN` script whose final argument is raw
+`BuiltinData`, with any earlier parameters represented by their declared
+compiled-interface types and encodings. All script parameters and one typed V3
+`ScriptContext` are *existentially* quantified. The generated claim is:
+
+```text
+There exist script parameters and a typed V3 ScriptContext ctx such that
+executing the exact compiled script on those parameters and encode(ctx)
+terminates successfully.
+```
+
+The source is equivalent to `∃ parameters ctx, isSuccessful(run(parameters,
+encode(ctx)))`. It does not mention purpose isolation, constrain the purpose,
+or read blueprint purpose metadata. A user may declare either template alone
+or both, and each receives its own checking result. The existence claim
+excludes an always-rejecting script but does not establish that every context
+is accepted, that a context obeys all ledger validity rules, or that the
+verification budget suffices for other paths. A step-limit exhaustion is not
+successful termination.

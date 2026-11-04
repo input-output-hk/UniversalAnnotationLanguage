@@ -12,8 +12,8 @@ program and its declared checking environment.
   and applied deployments.
 - [Temporal operators for Blaster state machines](./TemporalOperators.md): execution
   traces, previous/next, weak until, and state-machine invariants.
-- [Proposed property templates](./PropertyTemplates.md): short annotations that
-  expand into complete propositions, starting with purpose isolation.
+- [Proposed property templates](./PropertyTemplates.md): independent generated
+  claims for purpose isolation and existence of an accepted script context.
 
 The language version recorded in assurance documents is `1.0`. The corresponding
 repository release tag is `v1.0.0`.
