@@ -119,3 +119,7 @@ excludes an always-rejecting script but does not establish that every context
 is accepted, that a context obeys all ledger validity rules, or that the
 verification budget suffices for other paths. A step-limit exhaustion is not
 successful termination.
+
+The two verdicts are independent: an always-rejecting script can satisfy
+isolation while falsifying acceptance, and a script that accepts a wrong purpose
+can falsify isolation while satisfying acceptance.
