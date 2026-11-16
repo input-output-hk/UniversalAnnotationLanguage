@@ -201,6 +201,10 @@ not permitted.
 
 ### PROPERTY
 
+The [proposed property-template extension](./PropertyTemplates.md) supplies a
+short source form which expands into the explicit propositions described here.
+That proposed source syntax is not part of the published 1.0 release.
+
 ```haskell
 {-@ PROPERTY [scope: vestingValidator] owner_signature_required
     "A transaction that the owner has not signed fails script evaluation."
